@@ -24,7 +24,7 @@
         android:layout_above="@+id/current_temperature_field"
         android:layout_centerHorizontal="true"
         android:textColor="#FFFFFF"
-        android:textSize="90sp" />
+        android:textSize="70sp" />
 
     <TextView
         android:id="@+id/current_temperature_field"

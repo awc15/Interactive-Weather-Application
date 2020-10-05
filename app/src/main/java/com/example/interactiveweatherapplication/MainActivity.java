@@ -130,29 +130,30 @@ public class MainActivity extends AppCompatActivity {
         if (actualId == 800) {
             long currentTime = new Date().getTime();
             if (currentTime >= sunrise && currentTime < sunset) {
-                icon = "&#xf00d;";
+                icon = "\uF00D";
             } else {
-                icon = "&#xf02e;";
+                icon = "\uF02E";
+
             }
         } else {
             switch (id) {
                 case 2:
-                    icon = "&#xf01e;";
+                    icon = "\uF01E";
                     break;
                 case 3:
-                    icon = "&#xf01c;";
+                    icon = "\uf01c;";
                     break;
                 case 7:
-                    icon = "&#xf014;";
+                    icon = "\uf014;";
                     break;
                 case 8:
-                    icon = "&#xf013;";
+                    icon = "\uf013;";
                     break;
                 case 6:
-                    icon = "&#xf01b;";
+                    icon = "\uf01b;";
                     break;
                 case 5:
-                    icon = "&#xf019;";
+                    icon = "\uf019;";
                     break;
             }
         }
