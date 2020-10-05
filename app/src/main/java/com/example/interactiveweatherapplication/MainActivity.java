@@ -102,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
 
                 String city = jsonWeather.getString("name") + ", " + jsonWeather.getJSONObject("sys").getString("country");
                 String description = details.getString("description").toLowerCase(Locale.US);
-                String temperature = String.format("%.0f", main.getDouble("temp")) + "*";
-                String humidity = main.getString("humidity") + "%";
-                String pressure = main.getString("pressure") + "hPa";
+                String temperature = String.format("%.0f", main.getDouble("temp")) + "°";
+                String humidity = "Humidity Percentage : "+main.getString("humidity") + "%";
+                String pressure = "Air Pressure : "+main.getString("pressure") + "hPa";
                 String updateOn = dateFormat.format(new Date(jsonWeather.getLong("dt") * 1000));
                 String iconText = setWeatherIcon(details.getInt("id"), jsonWeather.getJSONObject("sys").getLong("sunrise") * 1000,
                         jsonWeather.getJSONObject("sys").getLong("sunset") * 1000);
