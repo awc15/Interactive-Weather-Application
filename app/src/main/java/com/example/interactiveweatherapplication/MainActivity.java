@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -33,6 +35,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -59,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView weatherIcon;
     Typeface weatherFont;
     private EditText enterCity;
-    static String latitude = "33.6844";
-    static String longitude = "73.0479";
+    static String latitude;
+    static String longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,17 +95,27 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-/*
 
         mFusedLocationProvider.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    latitude = String.valueOf(location.getLatitude());
-                    longitude = String.valueOf(location.getLongitude());
+                    double lat = location.getLatitude();
+                    double lng = location.getLongitude();
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                    List<Address> addresses = null;
+                    try {
+                        addresses = geocoder.getFromLocation(lat, lng, 3);
+                        String cityName = addresses.get(0).getLocality();
+                        getCurrentWeather(cityName);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
-                String[] jsonData = getJSONResponse();
+               /* String[] jsonData = getJSONResponse();
 
                 cityField.setText(jsonData[0]);
                 detailsField.setText(jsonData[1]);
@@ -110,10 +123,9 @@ public class MainActivity extends AppCompatActivity {
                 humidityField.setText(jsonData[3]);
                 pressureField.setText(jsonData[4]);
                 updateField.setText(jsonData[5]);
-                weatherIcon.setText(jsonData[6]);
+                weatherIcon.setText(jsonData[6]);*/
             }
         });
-*/
 
 
     }
@@ -301,6 +313,38 @@ public class MainActivity extends AppCompatActivity {
         return icon;
     }
 
+    public void getCurrentWeather(String cityName){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.openweathermap.org/data/2.5/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        WeatherApi myApi = retrofit.create(WeatherApi.class);
+        final Call<GetWeatherData> getWeatherData = myApi.getWeather(cityName, OPEN_WEATHER_MAP_API);
+        getWeatherData.enqueue(new Callback<GetWeatherData>() {
+            @Override
+            public void onResponse(Call<GetWeatherData> call, Response<GetWeatherData> response) {
+                if (response.code() == 404) {
+                    Toast.makeText(getApplicationContext(), "Enter Valid", Toast.LENGTH_SHORT).show();
+                } else if (!(response.isSuccessful())) {
+                    Toast.makeText(getApplicationContext(), "Response : " + response, Toast.LENGTH_SHORT).show();
+                } else {
+                    GetWeatherData weatherData = response.body();
+                    List<Weather> weather = weatherData.getWeather();
+                    Main main = weatherData.getMain();
+                    setAllWeatherData(main, weather);
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetWeatherData> call, Throwable t) {
+
+            }
+        });
+
+    }
+
     public void getWeather(View view) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.openweathermap.org/data/2.5/")
@@ -340,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
         detailsField.setText(desc);
 
         String icon = weather.get(0).getIcon();
-        IMAGE_ICON_URL=IMAGE_ICON_URL  + icon + ".png";
+        IMAGE_ICON_URL = IMAGE_ICON_URL + icon + ".png";
 
         Picasso.with(getApplicationContext()).load(IMAGE_ICON_URL).into(weatherIcon);
         //weatherIcon.setText(icon);
